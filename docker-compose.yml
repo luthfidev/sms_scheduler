@@ -1,0 +1,132 @@
+# version: '3'
+
+version: "3.9"
+networks:
+  sms-net:
+    ipam:
+      config:
+        - subnet: 172.20.10.0/24
+services:
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass 123456789
+    volumes:
+      - redis:/var/lib/redis
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+    networks:
+        sms-net:
+             ipv4_address: 172.20.10.2
+
+  mysql_db:
+    platform: linux/x86_64
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sms
+      MYSQL_USER: adminsms
+      MYSQL_PASSWORD: 123456789
+    volumes: 
+      - db:/var/lib/data
+      - ./init:/docker-entrypoint-initdb.d
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.110
+
+  api_schedule: 
+    build: 
+      context: ./api_schedule
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - api_schedule:/var/lib/api_schedule
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.111
+    ports:
+      - 3100:3100
+    expose:
+      - 3100
+  
+  consumer: 
+    build: 
+      context: ./queue/consumer
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - consumer:/var/lib/consumer
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.3
+
+  consumer-checker: 
+    build: 
+      context: ./queue/consumer-checker
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - consumer-checker:/var/lib/consumer-checker
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.4
+
+  producer: 
+    build: 
+      context: ./queue/producer
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - producer:/var/lib/producer
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.5
+
+  schedule: 
+    build: 
+      context: ./queue/schedule
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - schedule:/var/lib/schedule
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.6
+
+  worker: 
+    build: 
+      context: ./queue/worker
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - worker:/var/lib/worker
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+        sms-net:
+            ipv4_address: 172.20.10.7
+    
+volumes:
+  redis:
+  redis-config:
+  db:
+  api_schedule:
+  consumer:
+  consumer-checker:
+  producer:
+  schedule:
+  worker:
