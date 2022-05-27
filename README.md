@@ -4,6 +4,13 @@
 
 ***
 
+## Folder
+
+* api_schedule [api]
+* config [redis.conf]
+* init [sms.sql]
+* queue [event_driven]
+
 ## Dependencies API sms scheduler
 
 * Node Js
