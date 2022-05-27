@@ -1,4 +1,4 @@
-# API sms scheduler 
+# API sms scheduler Microservice Docker
 
     http://localhost:3100
 
@@ -72,10 +72,10 @@ docker-compose up -d
 
 ## API End Point
 ### SCHEDULE
-* [CREATE SCHEDULE](readme/signin.md) : `POST /schedule/PostSchedule`
-* [LIST SCHEDULE](readme/signup.md) : `GET /schedule?schedule=202205262341`
+* [CREATE SCHEDULE](readme/schedule/post.md) : `POST /schedule/PostSchedule`
+* [LIST SCHEDULE](readme/schedule/get.md) : `GET /schedule?schedule=202205262341`
 
 ### STATUS
-* [CREATE STATUS](readme/home/listOutletUser.md) : `POST /status/PostStatus`
-* [LIST STATUS](readme/home/addOutlet.md) : `GET /status`
+* [CREATE STATUS](readme/status/post.md) : `POST /status/PostStatus`
+* [LIST STATUS](readme/status/get.md) : `GET /status`
 
